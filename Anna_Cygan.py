@@ -5,6 +5,7 @@ sprawdza dostępność stron
 import json
 import os
 import datetime
+import time
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
@@ -24,7 +25,7 @@ def read_file():
 
             today = datetime.date.today()
 
-            timeout = context.get["timeout_seconds"]
+            timeout = context["timeout_seconds"]
 
             for day in context["days"]:
                 if day.get("day") == today.isoweekday():
@@ -40,22 +41,45 @@ def read_file():
         print("File read successfully")
 
 def availability_check(interval, urls, timeout):
-    try:
+    while True:
         for url in urls:
-            print(f"Checking url: {url}")
-            req = Request(url, headers={"User-Agent": "MyApp/1.0"})
-            with urlopen(req, timeout = timeout) as resp:
-                print(resp.getcode())
-                print(resp.read()[:1000].decode("utf-8"))
+            try:
+                print(f"<{datetime.datetime.now()}>")
+                print(f"Checking url: {url["url"]}")
+                req = Request(url["url"], headers={"User-Agent": "MyApp/1.0"})
+                start_time = time.perf_counter()
+                with urlopen(req, timeout = timeout) as resp:
+                    code = resp.getcode()
+                    if 200 <= code < 300:
+                        print("Replay: OK")
+                    elif 300 <= code < 400:
+                        print("Replay: Redirected")
+                    elif 400 <= code < 500:
+                        print("Replay: Error with query")
+                    elif 500 <= code < 600:
+                        print("Replay: Server error")
+                end_time = time.perf_counter()
+                print(f"Response time: {round(end_time-start_time,3)}s")
 
-    except HTTPError as e:
-        print("HTTPError: ", e.code, e.reason)
-        print("Body: ", e.read()[:200])
-    except URLError as e:
-        print("URLError: ", e.reason)
-    except Exception as e:
-        print("Other error: ", e)
-    else:
-        print("Availability check done successfully")
+            except HTTPError as e:
+                print("HTTPError: ", e.code, e.reason)
+                print("Body: ", e.read()[:200])
+            except URLError as e:
+                print("URLError: ", e.reason)
+            except Exception as e:
+                print("Other error: ", e)
+            else:
+                print("Availability check done successfully")
+            finally:
+                print()
+        print(f"Waiting {interval} seconds...\n")
+        time.sleep(interval)
 
-schedu
+def main():
+    info = read_file()
+    availability_check(info["interval_seconds"], info["urls"], info["timeout"])
+
+
+if __name__ == '__main__':
+    main()
+
