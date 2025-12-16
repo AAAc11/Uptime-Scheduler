@@ -1,0 +1,60 @@
+{
+  "timeout_seconds": 10,
+
+  "days": [
+    {
+      "day": 1,
+      "interval_seconds": 15,
+      "urls": [
+        { "url": "https://www.google.com" },
+        { "url": "http://api.internal.com/serviceA" }
+      ]
+    },
+    {
+      "day": 2,
+      "interval_seconds": 60,
+      "urls": [
+        { "url": "https://www.google.com" },
+        { "url": "https://docs.mycompany.com" }
+      ]
+    },
+    {
+      "day": 3,
+      "interval_seconds": 30,
+      "urls": [
+        { "url": "https://www.google.com" },
+        { "url": "https://status.github.com" }
+      ]
+    },
+    {
+      "day": 4,
+      "interval_seconds": 30,
+      "urls": [
+        { "url": "https://www.google.com" },
+        { "url": "https://status.github.com" }
+      ]
+    },
+    {
+      "day": 5,
+      "interval_seconds": 20,
+      "urls": [
+        { "url": "https://portal.mycompany.com" },
+        { "url": "https://www.google.com" }
+      ]
+    },
+    {
+      "day": 6,
+      "interval_seconds": 120,
+      "urls": [
+        { "url": "https://portal.mycompany.com" }
+      ]
+    },
+    {
+      "day": 7,
+      "interval_seconds": 300,
+      "urls": [
+        { "url": "https://portal.mycompany.com" }
+      ]
+    }
+  ]
+}
