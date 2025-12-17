@@ -11,7 +11,6 @@ from urllib.request import Request, urlopen
 
 FILE_NAME = 'Anna_Cygan_config.json'
 
-
 def read_file():
     """
     Funkcja odczytująca dane z pliku.
@@ -32,7 +31,8 @@ def read_file():
                     return {
                         "interval_seconds": day.get('interval_seconds'),
                         "urls": day.get('urls'),
-                        "timeout": timeout
+                        "timeout": timeout,
+                        "log": day.get('log')
                     }
 
     except FileNotFoundError:
@@ -40,45 +40,51 @@ def read_file():
     else:
         print("File read successfully")
 
-def availability_check(interval, urls, timeout):
-    while True:
-        for url in urls:
-            try:
-                print(f"<{datetime.datetime.now()}>")
-                print(f"Checking url: {url["url"]}")
-                req = Request(url["url"], headers={"User-Agent": "MyApp/1.0"})
-                start_time = time.perf_counter()
-                with urlopen(req, timeout = timeout) as resp:
-                    code = resp.getcode()
-                    if 200 <= code < 300:
-                        print("Replay: OK")
-                    elif 300 <= code < 400:
-                        print("Replay: Redirected")
-                    elif 400 <= code < 500:
-                        print("Replay: Error with query")
-                    elif 500 <= code < 600:
-                        print("Replay: Server error")
-                end_time = time.perf_counter()
-                print(f"Response time: {round(end_time-start_time,3)}s")
+def availability_check():
+    try:
+        while True:
+            info = read_file()
+            interval, urls, timeout, log = info["interval_seconds"], info["urls"], info["timeout"], info["log"]
+            for url in urls:
+                try:
+                    print(f"<{datetime.datetime.now().strftime('%H:%M:%S')}>")
+                    print(f"Checking url: {url['url']}")
+                    req = Request(url['url'], headers={"User-Agent": "MyApp/1.0"})
+                    start_time = time.perf_counter()
+                    with urlopen(req, timeout = timeout) as resp:
+                        code = resp.getcode()
+                        if 200 <= code < 300:
+                            print("Replay: OK")
+                        elif 300 <= code < 400:
+                            print("Replay: Redirected")
+                        elif 400 <= code < 500:
+                            print("Replay: Error with query")
+                        elif 500 <= code < 600:
+                            print("Replay: Server error")
+                    end_time = time.perf_counter()
+                    print(f"Response time: {round(end_time-start_time,3)}s")
+                except HTTPError as e:
+                    print("HTTPError: ", e.code, e.reason)
+                    print("Body: ", e.read()[:200])
+                except URLError as e:
+                    print("URLError: ", e.reason)
+                except Exception as e:
+                    print("Other error: ", e)
+                else:
+                    print("Availability check done successfully")
+                finally:
+                    print("=" * 15)
 
-            except HTTPError as e:
-                print("HTTPError: ", e.code, e.reason)
-                print("Body: ", e.read()[:200])
-            except URLError as e:
-                print("URLError: ", e.reason)
-            except Exception as e:
-                print("Other error: ", e)
-            else:
-                print("Availability check done successfully")
-            finally:
-                print()
-        print(f"Waiting {interval} seconds...\n")
-        time.sleep(interval)
+
+            print(f"Waiting {interval} seconds...(Press Ctrl+C to stop)\n")
+            time.sleep(interval)
+    except KeyboardInterrupt:
+        print("\nProgram interruption")
+    finally:
+        print("\nProgram closed")
 
 def main():
-    info = read_file()
-    availability_check(info["interval_seconds"], info["urls"], info["timeout"])
-
+            availability_check()
 
 if __name__ == '__main__':
     main()
