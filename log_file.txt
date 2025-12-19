@@ -1,0 +1,20 @@
+<12:09:17>
+Name: https://portal.mycompany.com
+Error: [Errno 11001] getaddrinfo failed
+Response time: -
+
+<12:09:17>
+Name: https://www.google.com
+Replay: OK
+Response time: 0.204
+
+<12:09:37>
+Name: https://portal.mycompany.com
+Error: [Errno 11001] getaddrinfo failed
+Response time: -
+
+<12:09:38>
+Name: https://www.google.com
+Replay: OK
+Response time: 0.156
+
